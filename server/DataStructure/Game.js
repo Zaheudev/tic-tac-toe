@@ -4,6 +4,7 @@
 function Game() {
   this.board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   this.corners = [0,2,6,8];
+  this.turn = "X";
   this.movesCounter = 0;
   this.firstMove = null;
 
@@ -11,17 +12,57 @@ function Game() {
     return this.board;
   };
 
-  this.setCell = (cell, user) => {
-    this.board[cell] = user;
-    if(this.movesCounter === 0){
-      this.firstMove = {cell: cell, player: user};
+  this.getTurn = () => {
+    return this.turn;
+  }
+
+  this.shiftTurn = () => {
+    if(this.turn === "X"){
+      this.turn = "O";
+    }else {
+      this.turn = "X";
     }
-    this.movesCounter++;
+  }
+
+  // here's the main function to make a move. It will change accordingly when adding player vs player.
+  this.setCell = (cell, player) => {
+    if(this.checkBoardState()){
+      //here checks if the state isn't draw, or in win state and quit the rest of execution.
+      return false;
+    }
+    // here checks if the player arg is it's turn and if the cell arg isn't already selected.
+    if(player === this.turn && typeof this.board[cell] !== "string"){ 
+      this.board[cell] = player;
+      this.shiftTurn();
+      if(this.movesCounter === 0){
+        this.firstMove = {cell: cell, player: player};
+      }
+      this.movesCounter++;
+      return true;
+    }
+    return false;
+  };
+  
+  this.botMove = () => {
+    if(this.checkBoardState()){
+      return;
+    }
+
+    let move = this.bestChoice("O")
+    this.setCell(move.cell, "O");
+    return move.score;
   };
 
   this.getEmptyCells = () => {
     return this.board.filter(i => i !== "O" && i !== "X");
   };
+
+  this.resetBoard = () => {
+    this.board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    this.turn = "X";
+    this.firstMove = null;
+    this.movesCounter = 0;
+  }
 
   this.checkWinning = (player) => {
     if (
@@ -40,7 +81,21 @@ function Game() {
     }
   };
 
-  this.checkState = (player, opponent) => {
+  // here evaluates state of the current presset and returns the value accordingly.
+  this.checkBoardState = () => {
+    if(this.getEmptyCells().length < 1){
+      return "draw";
+    }
+    if(this.checkWinning("X")){
+      return "X";
+    }else if(this.checkWinning("O")){
+      return "O";
+    }
+    return false;
+  }
+
+  // this is a function that helps the this.bestChoice() to evaluate every move temporarily made in order the find the best one.
+  this.checkMoveState = (player, opponent) => {
     if(this.checkWinning(opponent)){
       return -10;
     }else if(this.checkWinning(player)){
@@ -50,6 +105,8 @@ function Game() {
     }
   }
 
+  // this function is to get the best move from current presset of board. Now works perfectly, it's unbeatable.
+  // basically this function is minimax algorithm.
   this.bestChoice = (player) => {
     let emptyCells = this.getEmptyCells();
     let moves = [];
@@ -60,6 +117,7 @@ function Game() {
     }
 
     //here checks if the 'player' is in win state and if not insert all possible moves in a array to iterate later to find best move
+    //this may be refactored to a better solution in future, now works fine.
     for(let i=0; i<emptyCells.length; i++){
       let move = {};
 
@@ -67,7 +125,7 @@ function Game() {
 
       this.board[emptyCells[i]] = player;
       
-      move.score = this.checkState(player, OPPONENT);
+      move.score = this.checkMoveState(player, OPPONENT);
       if(move.score === 10){
         console.log("in win state");
         this.board[emptyCells[i]] = player;
@@ -83,7 +141,7 @@ function Game() {
       move.cell = this.board[emptyCells[i]];
       this.board[emptyCells[i]] = OPPONENT;
 
-      move.score = this.checkState(player, OPPONENT);
+      move.score = this.checkMoveState(player, OPPONENT);
 
       if(move.score === -10){
         console.log("in lose state");
@@ -107,7 +165,7 @@ function Game() {
   
         this.board[availSpots[j]] = player;
         
-        move.score = this.checkState(player, OPPONENT);
+        move.score = this.checkMoveState(player, OPPONENT);
         if(move.score === 10){
           this.board[availSpots[j]] = move.cell;
           this.board[currCell.cell] = currCell.cell;
@@ -122,7 +180,7 @@ function Game() {
       
             this.board[freeSpaces[f]] = player;
             
-            secondMove.score = this.checkState(player, OPPONENT);
+            secondMove.score = this.checkMoveState(player, OPPONENT);
             if(secondMove.score === 10){
               this.board[freeSpaces[f]] = secondMove.cell;
               this.board[availSpots[j]] = move.cell;

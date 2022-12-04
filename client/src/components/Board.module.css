@@ -1,0 +1,14 @@
+.table td {
+  border: 1px solid black;
+  height: 5vw;
+  width: 5vw;
+  padding: 0;
+  text-align: center;
+  font-size: 4vw;
+  cursor: pointer;
+}
+
+.table {
+  border-collapse: collapse;
+  margin-top: 1vw;
+}
