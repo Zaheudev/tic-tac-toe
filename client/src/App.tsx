@@ -1,8 +1,10 @@
-import React from 'react';
-import './App.css';
+import classes from './App.module.css';
 import { io } from "socket.io-client";
 import Board from './components/Board';
+import JoinForm from './components/JoinForm';
+import ToggleButton from './components/Layout/ToggleButton';
 
+// generates authentication code.
 function generateCode(length: number) {
   let result = "";
   let characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
@@ -25,8 +27,10 @@ socket.onAny((eventName, ...args) => {
 
 function App() {
   return (
-    <div className="App" style={{display:"flex",justifyContent:"center"}}>
+    <div className={classes.app}>
       <Board/>
+      <JoinForm/>
+      <ToggleButton/>
     </div>
   );
 }

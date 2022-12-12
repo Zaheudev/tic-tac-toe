@@ -27,10 +27,10 @@ function Game() {
   // here's the main function to make a move. It will change accordingly when adding player vs player.
   this.setCell = (cell, player) => {
     if(this.checkBoardState()){
-      //here checks if the state isn't draw, or in win state and quit the rest of execution.
-      return false;
+      //here checks if the state isn't draw, or in win state and quits the rest of execution and returns the state for further checking.
+      return this.checkBoardState();
     }
-    // here checks if the player arg is it's turn and if the cell arg isn't already selected.
+    // here checks if the player arg is it's turn and if the cell arg isn't already selected and returns the state of the game after the move.
     if(player === this.turn && typeof this.board[cell] !== "string"){ 
       this.board[cell] = player;
       this.shiftTurn();
@@ -38,9 +38,10 @@ function Game() {
         this.firstMove = {cell: cell, player: player};
       }
       this.movesCounter++;
-      return true;
+      return this.checkBoardState();
     }
-    return false;
+    // here returns always false;
+    return this.checkBoardState();
   };
   
   this.botMove = () => {

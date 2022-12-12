@@ -10,5 +10,6 @@
 
 .table {
   border-collapse: collapse;
-  margin-top: 1vw;
+  margin: 1vw 0;
+  
 }

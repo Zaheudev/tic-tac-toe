@@ -1,4 +1,5 @@
-import { socket } from "../App";
+import { useEffect } from "react";
+import { socket } from "../../App";
 
 import classes from './Board.module.css';
 
@@ -8,9 +9,14 @@ function Board() {
     socket.emit("makeMove", event.target.id);
   }
 
-  socket.on("updateBoard", (...args) => {
-    updateData(args[0].game.board);
-  })
+  useEffect(() => {
+    socket.on("updateBoard", (...args) => {
+      updateData(args[0].room.game.board);
+    });
+    return () => {
+      socket.off("updateBoard");
+    };
+  });
 
   const updateData = (array: any[]) => {
     array.forEach((value, index) => {

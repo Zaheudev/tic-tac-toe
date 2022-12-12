@@ -27,7 +27,7 @@ function User(symbol, name, code) {
   }
 
   this.won = () => {
-    this.wins++;
+    this.wins += 1;
   }
 }
 
